@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const timestamps = require('mongoose-timestamp')
 const mongooseStringQuery = require('mongoose-string-query')
 
 const Schema = mongoose.Schema
@@ -10,10 +9,9 @@ const DemoSchema = new Schema(
       type: String
     }
   },
-{ collection: 'demos' }
+{ collection: 'demos', timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 )
 
-DemoSchema.plugin(timestamps)
 DemoSchema.plugin(mongooseStringQuery)
 
 module.exports = exports = mongoose.model('Demo', DemoSchema)
