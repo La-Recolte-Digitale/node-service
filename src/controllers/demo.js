@@ -18,7 +18,6 @@ const asyncAction = (action) => (req, res, next) => action(req, res, next).catch
 
 exports.list = asyncAction(async (req, res) => {
   let demos = await Demo.apiQuery(req.query)
-  .select('name email phone odooId')
   res.json({ demos: demos })
 })
 
