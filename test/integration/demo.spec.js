@@ -83,7 +83,7 @@ describe('demo tests', () => {
   })
 
   describe('DELETE with no id failed /demo', () => {
-    test('responds with 200', async () => {
+    test('responds with 404', async () => {
       const res = await request(server)
       .delete('/demo/')
       .set('Accept', 'application/json')
@@ -92,7 +92,7 @@ describe('demo tests', () => {
   })
 
   describe('DELETE ALL /demo', () => {
-    test('responds with 200', async () => {
+    test('responds with 204', async () => {
       const res = await request(server)
       .delete('/demo')
       .set('Accept', 'application/json')
