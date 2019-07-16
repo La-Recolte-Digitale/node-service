@@ -34,11 +34,11 @@ exports.get = asyncAction(async (req, res) => {
 exports.put = asyncAction(async (req, res, next) => {
   const data = req.body || {}
 
-  let demo = await Demo.findByIdAndUpdate({ _id: req.params.id }, data, { new: true })
+  let demo = await Demo.findByIdAndUpdate({ _id: req.params.id }, data, { new: true, runValidators: true })
   if (!demo) {
     throw new NotFoundError(ERROR_MESSAGES.not_found)
   }
-  
+
   res.json(demo)
 })
 
