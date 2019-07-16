@@ -35,10 +35,22 @@ class UnprocessableEntityError extends RequestError {
   }
 }
 
+class DuplicatedKeyError extends Error {
+  constructor (model, field, message) {
+    super()
+    this.name = 'DuplicatedKeyError'
+    this.model = model
+    this.field = field
+    this.message = message || `${this.model} with such ${this.field} already exists`
+    Object.setPrototypeOf(this, DuplicatedKeyError.prototype)
+  }
+}
+
 module.exports = {
   ERROR_MESSAGES,
   RequestError,
   BadRequestError,
   NotFoundError,
-  UnprocessableEntityError
+  UnprocessableEntityError,
+  DuplicatedKeyError
 }

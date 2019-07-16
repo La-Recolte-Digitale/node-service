@@ -23,6 +23,11 @@ exports.list = asyncAction(async (req, res) => {
 
 exports.get = asyncAction(async (req, res) => {
   let demo = await Demo.findById(req.params.id)
+
+  if (!demo) {
+    throw new NotFoundError(ERROR_MESSAGES.not_found)
+  }
+
   res.json(demo)
 })
 
@@ -33,6 +38,7 @@ exports.put = asyncAction(async (req, res, next) => {
   if (!demo) {
     throw new NotFoundError(ERROR_MESSAGES.not_found)
   }
+  
   res.json(demo)
 })
 
