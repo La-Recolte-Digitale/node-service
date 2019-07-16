@@ -1,0 +1,36 @@
+version: '2'
+services:
+  node-template:
+    container_name: node-template-service
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    networks: 
+      net:
+        aliases:
+          - api
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_TEST_URL=mongodb://database:27017/test-db
+    depends_on:
+      - database
+    volumes:
+      - ./config:/app/config
+      - ./src:/app/src
+      - ./test:/app/test
+  database:
+    container_name: node-template-db-test
+    image: mongo:xenial
+    ports:
+      - "27017:27017"
+    volumes:
+    - db-data:/data/db
+    networks: 
+      net:
+        aliases:
+          - db
+volumes:
+  db-data:
+networks:
+  net:

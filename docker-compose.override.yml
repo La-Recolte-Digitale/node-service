@@ -1,0 +1,4 @@
+version: '2'
+services:
+  node-template:
+    command: npm run test:integration:watch

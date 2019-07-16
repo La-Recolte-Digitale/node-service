@@ -1,0 +1,18 @@
+FROM node:carbon
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+RUN npm install -g npm-audit-ci
+RUN npm install -g eslint
+RUN npm install -g eslint-config-standard
+RUN npm install -g eslint-plugin-standard
+RUN npm install -g eslint-plugin-promise
+RUN npm install -g eslint-plugin-import
+RUN npm install -g eslint-plugin-node
+
+EXPOSE 3000
+
+CMD ["npm", "run", "watch"]
