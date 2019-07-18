@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const config = require('../config/config')
 const mongoose = require('mongoose')
+const logger = require('./utils/logger')
 
 const {
   mongooseErrorHandler,
@@ -15,6 +16,22 @@ const {
 
 const api = express()
 const router = express.Router({ 'strict': true })
+let server
+
+const gracefulStart = () => {
+  require('./utils/db')
+  mongoose.connection.on('connected', async () => {
+    server = await api.listen(config.server.port)
+    logger.info(`listening on port: ${config.server.port}`)
+  })  
+}
+
+const gracefulShutdown = async () => {
+  await server.close()
+  await mongoose.connection.close()
+  logger.info(`Mongoose default connection is disconnected due to application termination`)
+  process.exit(0)
+}
 
 api.use(cors())
 api.use(bodyParser.urlencoded({ extended: true }))
@@ -35,32 +52,11 @@ api.get('/healthz', async (req, res) => {
 })
 
 if (!module.parent) {
-  require('./utils/db')
-
-  mongoose.connection.on('connected', () => {
-    api.listen(config.server.port, err => {
-      if (err) {
-        console.log(err)
-        process.exit(1)
-      }
-      console.log('listening on port: ', config.server.port)
-    })
-  })
+  gracefulStart()
 
   const sigs = ['SIGINT', 'SIGTERM', 'SIGQUIT']
   sigs.forEach(sig => {
-    process.on(sig, () => {
-      api.close(err => {
-        if (err) {
-          console.log(err)
-          process.exit(1)
-        }
-        mongoose.connection.close(function () {
-          console.log('Mongoose default connection is disconnected due to application termination')
-          process.exit(0)
-        })
-      })
-    })
+    process.on(sig, gracefulShutdown)
   })
 }
 

@@ -15,6 +15,8 @@ const initializeDatabase = async () => {
   await Demo.ensureIndexes()
 }
 
+mongoose.set('useFindAndModify', false);
+
 data.demos.forEach((demo) => {
   demo._id = mongoose.Types.ObjectId(demo.id)
   if (demo.composition && demo.composition.items) {

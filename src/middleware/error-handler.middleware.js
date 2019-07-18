@@ -4,6 +4,7 @@ const {
   UnprocessableEntityError
 } = require('../errors')
 var mongoose = require('mongoose')
+const logger = require('../utils/logger')
 const {
   ValidationError
 } = mongoose.Error
@@ -75,7 +76,7 @@ const requestErrorHandler = (err, req, res, next) => {
 }
 
 const errorHandler = (err, req, res, next) => {
-  console.error(err)
+  logger.error(err)
   res.status(500).json({
     error: {
       name: err.name,

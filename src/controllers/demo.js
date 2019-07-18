@@ -1,4 +1,4 @@
-const validator = require('validator')
+const aqp = require('api-query-params')
 
 const Demo = require('../models/demo')
 const {
@@ -17,7 +17,14 @@ exports.validateParameters = (req, res, next) => {
 const asyncAction = (action) => (req, res, next) => action(req, res, next).catch(next)
 
 exports.list = asyncAction(async (req, res) => {
-  let demos = await Demo.apiQuery(req.query)
+  const { filter, skip, limit, sort, projection } = aqp(req.query)
+  let demos = await Demo.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
+    .select(projection)
+    .exec()
+
   res.json({ demos: demos })
 })
 
