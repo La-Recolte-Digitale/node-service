@@ -1,0 +1,30 @@
+---
+version: "2"
+plugins:
+  csslint:
+    enabled: true
+  coffeelint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        javascript:
+          mass_threshold: 50
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  rubocop:
+    enabled: true
+exclude_patterns:
+- config/
+- db/
+- dist/
+- features/
+- node_modules/
+- script/
+- spec/
+- test/
+- tests/
+- vendor/
