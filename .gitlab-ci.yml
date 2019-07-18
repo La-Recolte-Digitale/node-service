@@ -1,0 +1,194 @@
+image: docker:stable
+
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  KUBERNETES_VERSION: 1.12.2
+  KUBECONFIG: kube-config.yaml
+  DEPLOYMENT_NAME: node-template
+  SERVICE_NAME: eshop-node-template
+
+.test:
+  stage: test
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - apk add --no-cache py2-pip
+    - pip install docker-compose~=1.23.0
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-image-build/
+
+test:
+  extends: .test
+  stage: test
+  script:
+    - docker-compose run --rm node-template npm run test:integration:run
+    - docker-compose down
+  allow_failure: true
+
+code_quality:
+  stage: test
+  image: docker:stable
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  script:
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code
+  artifacts:
+    paths: [gl-code-quality-report.json]
+    expire_in: 1 week
+  except:
+    variables:
+      - $CODE_QUALITY_DISABLED
+
+security:
+  extends: .test
+  stage: test
+  variables:
+    COMPOSE_FILE: docker-compose.yml
+  script:
+    - docker-compose run --rm node-template npm run audit
+    - docker-compose down
+  allow_failure: true
+
+.build:
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-image-build/
+
+build-master:
+  extends: .build
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - master
+
+build:
+  extends: .build
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  only:
+    - staging
+
+.deploy:
+  stage: deploy
+  image: alpine:3.5
+  before_script:
+    - apk add -U openssl curl tar gzip ca-certificates
+    - curl -L -o /usr/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+    - chmod +x /usr/bin/kubectl
+    - 'curl -s -o ${KUBECONFIG} --header "Authorization: Bearer ${DO_API_TOKEN}" "https://api.digitalocean.com/v2/kubernetes/clusters/${DO_CLUSTER_ID}/kubeconfig"' 
+    - mkdir ~/.kube/
+    - kubectl create secret -n ${KUBE_NAMESPACE} docker-registry gitlab-registry --docker-server=${CI_REGISTRY} --docker-username=${CI_REGISTRY_USER} --docker-email=${GITLAB_USER_EMAIL} --docker-password=${REGISTRY_ACCESS_TOKEN} -o yaml --dry-run | kubectl replace -n ${KUBE_NAMESPACE} --force -f -
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"'"}]}}}}'
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+
+deploy_staging:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: staging
+  only:
+    - staging
+
+deploy_worker_staging:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: staging
+    DEPLOYMENT_NAME: node-template-worker
+    SERVICE_NAME: eshop-node-template-worker
+  only:
+    - staging
+
+rollback_staging:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: staging
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  when: manual
+  only:
+    - staging
+
+rollback_worker_staging:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: staging
+    DEPLOYMENT_NAME: node-template-worker
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  when: manual
+  only:
+    - staging
+
+deploy_production:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: production
+  # deploy image tagged 'latest' built from master
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:latest"'"}]}}}}'
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  only:
+    - master
+
+deploy_worker_production:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: production
+    DEPLOYMENT_NAME: node-template-worker
+    SERVICE_NAME: eshop-node-template-worker
+  # deploy image tagged 'latest' built from master
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:latest"'"}]}}}}'
+    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  only:
+    - master
+
+rollback_production:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: production
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  when: manual
+
+rollback_worker_production:
+  extends: .deploy
+  variables:
+    KUBE_NAMESPACE: production
+    DEPLOYMENT_NAME: node-template-worker
+  script:
+    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
+    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+  when: manual
