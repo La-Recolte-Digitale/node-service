@@ -82,14 +82,22 @@ describe('demo tests', () => {
       .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
+
+    test('responds with incorrect id', async () => {
+      const res = await request(server)
+      .put('/demo/51224d776a326fb40f000003')
+      .send(data.demos[0])
+      .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(404)
+    })
   })
 
   describe('DELETE with no id failed /demo', () => {
-    test('responds with 404', async () => {
+    test('responds with 204', async () => {
       const res = await request(server)
-      .delete('/demo/')
+      .delete('/demo/' + data.demos[0].id)
       .set('Accept', 'application/json')
-      expect(res.statusCode).toBe(404)
+      expect(res.statusCode).toBe(204)
     })
   })
 
