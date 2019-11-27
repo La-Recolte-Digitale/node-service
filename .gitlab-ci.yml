@@ -27,36 +27,27 @@ test:
   extends: .test
   stage: test
   script:
-    - docker-compose run --rm node-template npm run test:integration:run
+    - docker-compose run --rm ${SERVICE_NAME} npm run test:integration:run
     - docker-compose down
   allow_failure: true
 
 code_quality:
-  stage: test
   image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
   allow_failure: true
   services:
     - docker:stable-dind
-  variables:
-    DOCKER_DRIVER: overlay2
   script:
-    - |
-      if ! docker info &>/dev/null; then
-        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
-          export DOCKER_HOST='tcp://localhost:2375'
-        fi
-      fi
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
     - docker run
         --env SOURCE_CODE="$PWD"
         --volume "$PWD":/code
         --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code
+        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
   artifacts:
-    paths: [gl-code-quality-report.json]
-    expire_in: 1 week
-  except:
-    variables:
-      - $CODE_QUALITY_DISABLED
+    reports:
+      codequality: gl-code-quality-report.json
 
 security:
   extends: .test
@@ -64,7 +55,7 @@ security:
   variables:
     COMPOSE_FILE: docker-compose.yml
   script:
-    - docker-compose run --rm node-template npm run audit
+    - docker-compose run --rm ${SERVICE_NAME} npm run audit
     - docker-compose down
 
 .build:

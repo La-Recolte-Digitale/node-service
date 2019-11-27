@@ -3,9 +3,9 @@ FROM node:carbon
 WORKDIR /app
 
 COPY package.json .
+COPY .eslintrc .
 
 RUN npm install
-RUN npm install -g npm-audit-ci
 RUN npm install -g eslint
 RUN npm install -g eslint-config-standard
 RUN npm install -g eslint-plugin-standard

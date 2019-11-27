@@ -3,29 +3,60 @@ const mongoose = require('mongoose')
 const config = require('../../../config/config')
 const logger = require('../logger')
 
+const timeout = (seconds) => {
+  return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
+}
+
+let server
+
+const init = async (api) => {
+  if (api) {
+    server = api
+  }
+  try {
+    await mongoose.connect(config.database.uri, config.database.options)
+  } catch (error) {
+    logger.info('Cannot connect to database')
+  }
+}
+
+const closeConnection = async () => {
+  if (server) {
+    await server.close()
+  }
+  try {
+    await mongoose.connection.close()
+  } catch (error) {
+    logger.info('Cannot close database')
+  }
+}
+
 mongoose.Promise = global.Promise
 mongoose.set('useFindAndModify', false);
 
-const connection = mongoose.connect(config.database.uri, config.database.options)
-
-mongoose.connection.on('connected', function () {
+mongoose.connection.on('connected', async () => {
   logger.info('Mongoose default connection is open')
-})
-
-mongoose.connection.on('error', function (err) {
-  logger.error(`Mongoose default connection has occured ${err} error`)
-  if (err.name === 'MongoNetworkError') {
-    logger.info('Attempting to re-establish database connection.')
-
-    setTimeout(function () {
-      logger.info('Retrying first connect...')
-      mongoose.connect(config.database.uri, config.database.options)
-    }, 5 * 1000)
+  if (server) {
+    server = await server.listen(config.server.port)
+    logger.info(`Server is listening on port: ${config.server.port}`)
   }
 })
 
-mongoose.connection.on('disconnected', function () {
+mongoose.connection.on('error', async (err) => {
+  logger.info('An error on mongoose default connection has occured')
+  logger.info(err)
+  if (err.name === 'MongoNetworkError') {
+    await timeout(5)
+    logger.info('Attempting to re-establish database connection.')
+    await init()
+  }
+})
+
+mongoose.connection.on('disconnected', () => {
   logger.info('Mongoose default connection is disconnected')
 })
 
-module.exports = connection
+module.exports = {
+  init,
+  closeConnection
+}

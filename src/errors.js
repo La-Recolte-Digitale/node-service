@@ -4,6 +4,7 @@ const ERROR_MESSAGES = Object.freeze({
   not_found: 'Entity not found.'
 })
 
+/* istanbul ignore next */
 class RequestError extends Error {
   constructor (message, name, statusCode) {
     super()
@@ -14,6 +15,7 @@ class RequestError extends Error {
   }
 }
 
+/* istanbul ignore next */
 class BadRequestError extends RequestError {
   constructor (message) {
     super(message || 'Bad Request Error', 'BadRequest', 400)
@@ -21,6 +23,7 @@ class BadRequestError extends RequestError {
   }
 }
 
+/* istanbul ignore next */
 class NotFoundError extends RequestError {
   constructor (message) {
     super(message || 'Not Found Error', 'NotFound', 404)
@@ -28,6 +31,7 @@ class NotFoundError extends RequestError {
   }
 }
 
+/* istanbul ignore next */
 class UnprocessableEntityError extends RequestError {
   constructor (message) {
     super(message || 'Unprocessable Entity Error', 'UnprocessableEntity', 422)
@@ -35,6 +39,7 @@ class UnprocessableEntityError extends RequestError {
   }
 }
 
+/* istanbul ignore next */
 class DuplicatedKeyError extends Error {
   constructor (model, field, message) {
     super()
