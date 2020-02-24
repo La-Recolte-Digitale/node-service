@@ -1,184 +1,140 @@
 image: docker:stable
+services:
+  - docker:18.09-dind
 
 stages:
   - test
   - build
   - deploy
+  - open
+
+#############
+# TEMPLATES #
+#############
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Jobs/Code-Quality.gitlab-ci.yml
+  - project: 'la-recolte/template'
+    file: '/template-test.gitlab-ci.yml'
+  - project: 'la-recolte/template'
+    file: '/template-build.gitlab-ci.yml'
+  - project: 'la-recolte/template'
+    file: '/template-deploy.gitlab-ci.yml'
+  - project: 'la-recolte/template'
+    file: '/template-security.gitlab-ci.yml'
+  - project: 'la-recolte/template'
+    file: '/template-auto-mr.gitlab-ci.yml'  
+
+#############
+# VARIABLES #
+#############
 
 variables:
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay
+  DOCKER_TLS_CERTDIR: ""
   KUBERNETES_VERSION: 1.12.2
   KUBECONFIG: kube-config.yaml
   DEPLOYMENT_NAME: node-template
   SERVICE_NAME: node-template
 
-.test:
-  stage: test
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - apk add --no-cache py2-pip
-    - pip install docker-compose~=1.23.0
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /skip-image-build/
+###############
+# STAGE: TEST #
+###############
 
 test:
-  extends: .test
+  extends:
+    - .template-test
+    - .test
   stage: test
-  script:
-    - docker-compose run --rm ${SERVICE_NAME} npm run test:integration:run
-    - docker-compose down
-  allow_failure: true
-
-code_quality:
-  image: docker:stable
+  
+coverage:
+  extends:
+    - .template-test
+    - .test
+  stage: test
   variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:stable-dind
-  script:
-    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-        --env SOURCE_CODE="$PWD"
-        --volume "$PWD":/code
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
-  artifacts:
-    reports:
-      codequality: gl-code-quality-report.json
+    TEST_SCRIPT: coverage
+
+
+###############
+# STAGE: LINT #
+###############
+
+lint:
+  extends: .lint
+  except:
+    - master
+  
+lint-master:
+  extends: .lint
+  only:
+    - master
+
+###################
+# STAGE: SECURITY #
+###################
 
 security:
-  extends: .test
-  stage: test
-  variables:
-    COMPOSE_FILE: docker-compose.yml
-  script:
-    - docker-compose run --rm ${SERVICE_NAME} npm run audit
-    - docker-compose down
+  extends: .template-security
 
-.build:
-  stage: build
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  except:
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /skip-image-build/
+
+###############
+# STAGE: BUILD#
+###############
 
 build-master:
-  extends: .build
-  script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
-  only:
-    - master_branch
+  extends:
+    - .template-build
+    - .build-master
 
 build:
-  extends: .build
-  script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-  only:
-    - staging_branch
+  extends:
+    - .template-build
+    - .build
 
-.deploy:
-  stage: deploy
-  image: alpine:3.5
-  before_script:
-    - apk add -U openssl curl tar gzip ca-certificates
-    - curl -L -o /usr/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
-    - chmod +x /usr/bin/kubectl
-    - 'curl -s -o ${KUBECONFIG} --header "Authorization: Bearer ${DO_API_TOKEN}" "https://api.digitalocean.com/v2/kubernetes/clusters/${DO_CLUSTER_ID}/kubeconfig"' 
-    - mkdir ~/.kube/
-    - kubectl create secret -n ${KUBE_NAMESPACE} docker-registry gitlab-registry --docker-server=${CI_REGISTRY} --docker-username=${CI_REGISTRY_USER} --docker-email=${GITLAB_USER_EMAIL} --docker-password=${REGISTRY_ACCESS_TOKEN} -o yaml --dry-run | kubectl replace -n ${KUBE_NAMESPACE} --force -f -
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"'"}]}}}}'
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
+################
+# STAGE: DEPLOY#
+################
 
 deploy_staging:
-  extends: .deploy
-  variables:
-    KUBE_NAMESPACE: staging
-  only:
-    - staging_branch
-
-deploy_worker_staging:
-  extends: .deploy
-  variables:
-    KUBE_NAMESPACE: staging
-    DEPLOYMENT_NAME: node-template-worker
-    SERVICE_NAME: eshop-node-template-worker
-  only:
-    - staging_branch
+  extends: .template-deploy
 
 rollback_staging:
-  extends: .deploy
-  variables:
-    KUBE_NAMESPACE: staging
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  when: manual
-  only:
-    - staging_branch
-
-rollback_worker_staging:
-  extends: .deploy
-  variables:
-    KUBE_NAMESPACE: staging
-    DEPLOYMENT_NAME: node-template-worker
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  when: manual
-  only:
-    - staging_branch
+  extends:
+    - .template-deploy
+    - .rollback
 
 deploy_production:
-  extends: .deploy
+  extends:
+    - .template-deploy
+    - .deploy
   variables:
     KUBE_NAMESPACE: production
-  # deploy image tagged 'latest' built from master
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:latest"'"}]}}}}'
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  only:
-    - master_branch
-
-deploy_worker_production:
-  extends: .deploy
-  variables:
-    KUBE_NAMESPACE: production
-    DEPLOYMENT_NAME: node-template-worker
-    SERVICE_NAME: eshop-node-template-worker
-  # deploy image tagged 'latest' built from master
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$SERVICE_NAME"'","image":"'"$CI_REGISTRY_IMAGE:latest"'"}]}}}}'
-    - kubectl -n ${KUBE_NAMESPACE} patch deployment/${DEPLOYMENT_NAME} -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  only:
-    - master_branch
 
 rollback_production:
-  extends: .deploy
+  extends:
+    - .template-deploy
+    - .rollback
   variables:
     KUBE_NAMESPACE: production
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  when: manual
+  only:
+    - master
 
-rollback_worker_production:
-  extends: .deploy
+#################
+# STAGE: AUTO-MR#
+#################
+
+merge_request:
+  extends: .open_merge_request
+  only:
+    - develop
+    
+merge_request_production:
+  extends: .open_merge_request
   variables:
-    KUBE_NAMESPACE: production
-    DEPLOYMENT_NAME: node-template-worker
-  script:
-    - kubectl -n ${KUBE_NAMESPACE} rollout undo deployment/${DEPLOYMENT_NAME}
-    - kubectl -n ${KUBE_NAMESPACE} rollout status deployment/${DEPLOYMENT_NAME}
-  when: manual
+    SOURCE_BRANCH: staging
+    TARGET_BRANCH: master
+  only:
+    - staging
