@@ -1,0 +1,37 @@
+version: '2'
+services:
+  node-template:
+    container_name: node-template-service
+    image: node:erbium
+    networks: 
+      net:
+        aliases:
+          - api
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_TEST_URL=mongodb://database:27017/test-db
+      - NODE_ENV=development
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "npm install &&
+        npm run watch"
+  
+  database:
+    container_name: node-template-db-test
+    image: mongo:4.2.5-bionic
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+    networks: 
+      net:
+        aliases:
+          - db
+volumes:
+  db-data:
+networks:
+  net:
