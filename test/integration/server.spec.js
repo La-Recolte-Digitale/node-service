@@ -1,12 +1,14 @@
-const config = require('../../config/config')
 const request = require('supertest')
+const server = require('../../src/server')
+let config = require('../../config/config')
+
+const { gracefulStart } = require('../../src/utils/server')
 
 const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }
 
 jest.setTimeout(60000)
-let server
 
 global.console = {
   log: jest.fn(),
@@ -15,7 +17,7 @@ global.console = {
 }
 
 beforeAll(async () => {
-  server = await require('../../src/server')
+
 })
 
 afterAll(async () => {
@@ -31,9 +33,12 @@ afterEach(async () => {
 
 describe('Server', () => {
   describe('Graceful start and stop', () => {
-    it('starts gracefully', async () => {
+    it('starts gracefully', async (done) => {
+      config.server.port = 3005
+      await gracefulStart({api: server, port: 3005})
       await timeout(1) 
-      expect(global.console.log).toHaveBeenNthCalledWith(2, `info: Server is listening on port: ${config.server.port} {\"service\":\"node-template-service\"}`)
+      expect(global.console.log).toHaveBeenNthCalledWith(1, `info: Server is listening on port: 3005 {\"service\":\"node-template-service\"}`)
+      done()
     })
     it('healthz return 200', async () => {
       const res = await request(server)

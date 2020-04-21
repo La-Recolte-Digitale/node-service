@@ -46,7 +46,7 @@ describe('Database', () => {
       await require('../../src/utils/db').init()
       await timeout(1)
       expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Cannot connect to database {\"service\":\"node-template-service\"}')
-      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occured {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occurred {\"service\":\"node-template-service\"}')
     })
   })
 })

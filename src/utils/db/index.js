@@ -10,9 +10,9 @@ const timeout = (seconds) => {
 let server
 
 const init = async (api) => {
-  if (api) {
-    server = api
-  }
+  // if (api) {
+  //   server = api
+  // }
   try {
     await mongoose.connect(config.database.uri, config.database.options)
   } catch (error) {
@@ -21,9 +21,9 @@ const init = async (api) => {
 }
 
 const closeConnection = async () => {
-  if (server) {
-    await server.close()
-  }
+  // if (server) {
+  //   await server.close()
+  // }
   try {
     await mongoose.connection.close()
   } catch (error) {
@@ -36,14 +36,14 @@ mongoose.set('useFindAndModify', false);
 
 mongoose.connection.on('connected', async () => {
   logger.info('Mongoose default connection is open')
-  if (server) {
-    server = await server.listen(config.server.port)
-    logger.info(`Server is listening on port: ${config.server.port}`)
-  }
+  // if (server) {
+  //   server = await server.listen(config.server.port)
+  //   logger.info(`Server is listening on port: ${config.server.port}`)
+  // }
 })
 
 mongoose.connection.on('error', async (err) => {
-  logger.info('An error on mongoose default connection has occured')
+  logger.info('An error on mongoose default connection has occurred')
   logger.info(err)
   if (err.name === 'MongoNetworkError') {
     await timeout(5)
