@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-
 const config = require('../../../config/config')
 const logger = require('../logger')
 
@@ -7,12 +6,7 @@ const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }
 
-let server
-
-const init = async (api) => {
-  // if (api) {
-  //   server = api
-  // }
+const init = async () => {
   try {
     await mongoose.connect(config.database.uri, config.database.options)
   } catch (error) {
@@ -21,9 +15,6 @@ const init = async (api) => {
 }
 
 const closeConnection = async () => {
-  // if (server) {
-  //   await server.close()
-  // }
   try {
     await mongoose.connection.close()
   } catch (error) {
@@ -32,14 +23,10 @@ const closeConnection = async () => {
 }
 
 mongoose.Promise = global.Promise
-mongoose.set('useFindAndModify', false);
+mongoose.set('useFindAndModify', false)
 
 mongoose.connection.on('connected', async () => {
   logger.info('Mongoose default connection is open')
-  // if (server) {
-  //   server = await server.listen(config.server.port)
-  //   logger.info(`Server is listening on port: ${config.server.port}`)
-  // }
 })
 
 mongoose.connection.on('error', async (err) => {
