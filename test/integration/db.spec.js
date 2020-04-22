@@ -1,6 +1,3 @@
-const mongoose = require('mongoose')
-//const config = require('../../config/config')
-
 const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }

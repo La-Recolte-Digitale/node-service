@@ -21,11 +21,11 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  
+
 })
 
 beforeEach(async () => {
-  
+
 })
 
 afterEach(async () => {
@@ -35,19 +35,19 @@ describe('Server', () => {
   describe('Graceful start and stop', () => {
     it('starts gracefully', async (done) => {
       config.server.port = 3005
-      await gracefulStart({api: server, port: 3005})
-      await timeout(1) 
+      await gracefulStart({ api: server })
+      await timeout(1)
       expect(global.console.log).toHaveBeenNthCalledWith(1, `info: Server is listening on port: 3005 {\"service\":\"node-template-service\"}`)
       done()
     })
     it('healthz return 200', async () => {
       const res = await request(server)
-      .get('/healthz')
-      .set('Accept', 'application/json')
+        .get('/healthz')
+        .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
     it('stops gracefully on SIGQUIT', async () => {
-      process.emit('SIGQUIT'); 
+      process.emit('SIGQUIT');
       await timeout(1)
       expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Mongoose default connection is disconnected due to application termination {\"service\":\"node-template-service\"}')
     })
