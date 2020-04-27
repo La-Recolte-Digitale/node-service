@@ -30,7 +30,7 @@ api.use(requestErrorHandler)
 api.use(entityNotFoundHandler)
 api.use(errorHandler)
 
- /* istanbul ignore next */
+/* istanbul ignore next */
 if (!module.parent) {
   gracefulStart({ api })
 }

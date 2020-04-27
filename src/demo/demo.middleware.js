@@ -8,7 +8,7 @@ const validateParameters = async (req, res, next) => {
   if (!isId) {
     const err = new ValidationError(ERROR_MESSAGES.id_is_invalid)
     next(err)
-  } 
+  }
   next()
 }
 
