@@ -5,7 +5,10 @@ const mongooseErrorHandler = (err, req, res, next) => {
   // Handle other errors from mongoose
   if (err.name === 'CastError' || err.name === 'ValidationError') {
     res.status(400).json({
-      error: { message: err.message || 'Mongoose error' }
+      error: {
+        name: err.name,
+        message: err.message || 'Mongoose error'
+      }
     })
     return
   }
@@ -51,6 +54,7 @@ const validationErrorHandler = (err, req, res, next) => {
         : `${error.path} is invalid`
       ).join('\n')
     res.status(400).json({
+      name: err.name,
       error: { message: message }
     })
     return

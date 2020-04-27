@@ -3,7 +3,7 @@ const controller = require('./demo.controller')
 const { validateParameters } = require('./demo.middleware')
 
 router.get('/', controller.list)
-router.get('/:id', controller.get)
+router.get('/:id', validateParameters, controller.get)
 router.put('/:id', validateParameters, controller.put)
 router.post('/', controller.post)
 router.delete('/:id', validateParameters, controller.delete)

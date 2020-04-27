@@ -51,7 +51,31 @@ describe('demo tests', () => {
 
   describe('GET /demo/:id', () => {
     test('responds with 200', async () => {
-      const id =data.insertIntoDb[0].id
+      const id = data.insertIntoDb[0].id
+      const res = await request(server)
+        .get(`/demo/${id}`)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(200)
+    })
+    test('respond with 404', async () => {
+      const id = "5e9ec0938777791177bd5727"
+      const res = await request(server)
+        .get(`/demo/${id}`)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(404)
+    })
+    test('not a valid mongo Id', async () => {
+      const id = "Cpasbon"
+      const res = await request(server)
+        .get(`/demo/${id}`)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(400)
+    })
+  })
+
+  describe('GET /demo/:id', () => {
+    test('responds with 200', async () => {
+      const id = data.insertIntoDb[0].id
       const res = await request(server)
         .get(`/demo/${id}`)
         .set('Accept', 'application/json')
@@ -69,16 +93,31 @@ describe('demo tests', () => {
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
+    test('responds with 400', async () => {
+      const res = await request(server)
+        .post('/demo')
+        .send()
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(400)
+    })
   })
 
   describe('PUT /demo/:id', () => {
-    const id = data.putDemo.id
-    const putData = data.putDemo.successPut
-
     test('responds with 200', async () => {
+      const id = data.putDemo.id
+      const putData = data.putDemo.successPut
       const res = await request(server)
         .put(`/demo/${id}`)
         .send(putData)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(200)
+    })
+
+    test('responds with 200 (put empty)', async () => {
+      const id = data.putDemo.id
+      const res = await request(server)
+        .put(`/demo/${id}`)
+        .send()
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
@@ -96,7 +135,7 @@ describe('demo tests', () => {
 
   describe('DELETE with no id failed /demo', () => {
     test('responds with 204', async () => {
-      const id =data.insertIntoDb[0].id
+      const id = data.insertIntoDb[0].id
       const res = await request(server)
         .delete(`/demo/${id}`)
         .set('Accept', 'application/json')

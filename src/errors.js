@@ -1,6 +1,7 @@
 
 const ERROR_MESSAGES = Object.freeze({
-  id_is_required: 'id is required',
+  id_is_required: 'id is required.',
+  id_is_invalid: 'id is invalid.',
   not_found: 'Entity not found.'
 })
 
@@ -51,11 +52,22 @@ class DuplicatedKeyError extends Error {
   }
 }
 
+class ValidationError extends RequestError {
+  constructor (message) {
+    super()
+    this.name = 'ValidationError'
+    this.statusCode = 400
+    this.message = message || `Validation Error`
+    Object.setPrototypeOf(this, ValidationError.prototype)
+  }
+}
+
 module.exports = {
   ERROR_MESSAGES,
   RequestError,
   BadRequestError,
   NotFoundError,
   UnprocessableEntityError,
-  DuplicatedKeyError
+  DuplicatedKeyError,
+  ValidationError
 }

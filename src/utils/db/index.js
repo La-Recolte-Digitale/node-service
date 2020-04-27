@@ -32,6 +32,7 @@ mongoose.connection.on('connected', async () => {
 mongoose.connection.on('error', async (err) => {
   logger.info('An error on mongoose default connection has occurred')
   logger.info(err)
+  /* istanbul ignore next */
   if (err.name === 'MongoNetworkError') {
     await timeout(5)
     logger.info('Attempting to re-establish database connection.')
