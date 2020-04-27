@@ -1,15 +1,20 @@
 service_name=node-template-service
 database_name=node-template-db-test
 
-service-run:
+run:
 	gnome-terminal \
-		--title="Node_template Service Containers" \
-		-- sh -c "CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-dev.yml up; exec bash";
+		--title="${service_name} Containers" \
+		-- sh -c "docker-compose -f docker-compose.yml up; exec bash";
 
-service-stop:
-	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-dev.yml down
+build:
+	gnome-terminal \
+		--title="${service_name} Containers" \
+		-- sh -c "docker-compose -f docker-compose.yml build; exec bash";
 
-service-logs:
+stop:
+	docker-compose -f docker-compose.yml down
+
+logs:
 	gnome-terminal \
 	--title="Logs_$(service_name)" \
 	-- sh -c "docker logs -f $(service_name); exec bash";

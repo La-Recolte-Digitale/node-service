@@ -13,15 +13,17 @@ services:
       - "3000:3000"
     environment:
       - MONGO_TEST_URL=mongodb://database:27017/test-db
+      - NODE_ENV=development
     depends_on:
       - database
     volumes:
       - ./config:/app/config
       - ./src:/app/src
       - ./test:/app/test
+      - ${PWD}/package.json:/app/package.json
   database:
     container_name: node-template-db-test
-    image: mongo:xenial
+    image: mongo:4.2.5-bionic
     ports:
       - "27017:27017"
     volumes:
