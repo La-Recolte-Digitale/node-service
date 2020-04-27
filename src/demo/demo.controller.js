@@ -1,5 +1,5 @@
 const aqp = require('api-query-params')
-const Demo = require('./demo.model')
+const demoService = require('./demo.service')
 const {
     ERROR_MESSAGES,
     NotFoundError
@@ -8,30 +8,24 @@ const { asyncAction } = require('../utils/request')
 
 exports.list = asyncAction(async (req, res) => {
     const { filter, skip, limit, sort, projection } = aqp(req.query)
-    const demos = await Demo.find(filter)
-        .skip(skip)
-        .limit(limit)
-        .sort(sort)
-        .select(projection)
-        .exec()
-
+    const demos = await demoService.list({ filter, skip, limit, sort, projection })
     res.json({ demos: demos })
 })
 
 exports.get = asyncAction(async (req, res) => {
-
-    const demo = await Demo.findById(req.params.id)
+    const { id } = req.params
+    const demo = await demoService.findById(id)
     if (!demo) {
         throw new NotFoundError(ERROR_MESSAGES.not_found)
     }
-
     res.json(demo)
 })
 
 exports.put = asyncAction(async (req, res, next) => {
     const data = req.body || {}
+    const { id } = req.params
 
-    const demo = await Demo.findByIdAndUpdate({ _id: req.params.id }, data, { new: true, runValidators: true })
+    const demo = await demoService.updateById({ id, data })
     if (!demo) {
         throw new NotFoundError(ERROR_MESSAGES.not_found)
     }
@@ -42,17 +36,18 @@ exports.put = asyncAction(async (req, res, next) => {
 exports.post = asyncAction(async (req, res) => {
     const data = req.body || {}
 
-    const demo = await Demo.create(data)
+    const demo = await demoService.create(data)
     res.json(demo)
 })
 
-exports.delete = async (req, res) => {
-    await Demo.deleteOne({ _id: req.params.id })
+exports.delete = asyncAction(async (req, res) => {
+    const { id } =  req.params
+    await demoService.deleteById(id)
     res.status(204).send()
-}
+})
 
 exports.deleteAll = asyncAction(async (req, res) => {
-    await Demo.deleteMany({})
+    await demoService.deleteAll()
     return res.status(204).send()
 })
 
