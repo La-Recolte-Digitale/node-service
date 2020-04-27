@@ -1,18 +1,23 @@
-const logger = require('../utils/logger')
+const logger = require('./logger')
+const db = require('./db')
 const config = require('../../config/config')
 
-const gracefulStart = async ({ api, port }) => {
-  // Start the server
-  await api.listen(config.server.port)
-  logger.info(`Server is listening on port: ${config.server.port}`)
+let server
+
+const gracefulStart = async ({ api }) => {
   // Start mongo
-  await require('../utils/db').init()
+  await db.init()
+  // Start api
+  server = await api.listen(config.server.port)
+  logger.info(`Server is listening on port: ${config.server.port}`)
 }
 
 const gracefulShutdown = async () => {
-  await require('./db').closeConnection()
-  logger.info('Mongoose default connection is disconnected due to application termination')
-   /* istanbul ignore next */
+  await server.close()
+  logger.info('[GRACEFUL SHUTDOWN] - Server is closed')
+  await db.closeConnection()
+  logger.info('[GRACEFUL SHUTDOWN] - Mongoose default connection is disconnected due to application termination')
+  /* istanbul ignore next */
   if (!module.parent.parent.filename.includes('server.spec.js')) {
     process.exit(0)
   }

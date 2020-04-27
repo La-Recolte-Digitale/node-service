@@ -37,7 +37,8 @@ describe('Server', () => {
       config.server.port = 3005
       await gracefulStart({ api: server })
       await timeout(1)
-      expect(global.console.log).toHaveBeenNthCalledWith(1, `info: Server is listening on port: 3005 {\"service\":\"node-template-service\"}`)
+      expect(global.console.log).toHaveBeenNthCalledWith(1, `info: Mongoose default connection is open {\"service\":\"node-template-service\"}`)
+      expect(global.console.log).toHaveBeenNthCalledWith(2, `info: Server is listening on port: 3005 {\"service\":\"node-template-service\"}`)
       done()
     })
     it('healthz return 200', async () => {
@@ -49,7 +50,8 @@ describe('Server', () => {
     it('stops gracefully on SIGQUIT', async () => {
       process.emit('SIGQUIT');
       await timeout(1)
-      expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Mongoose default connection is disconnected due to application termination {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(3, 'info: [GRACEFUL SHUTDOWN] - Server is closed {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: [GRACEFUL SHUTDOWN] - Mongoose default connection is disconnected due to application termination {\"service\":\"node-template-service\"}')
     })
   })
 })
