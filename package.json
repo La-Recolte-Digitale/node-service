@@ -66,13 +66,11 @@
     "format": "npx prettier-standard src/**/*.js",
     "lint": "npx eslint ./src",
     "lint:fix": "npx eslint ./src --fix",
-    "coverage": "npx jest --forceExit --coverage",
-    "test": "npx jest --watchAll --runInBand",
+    "test": "npx jest --runInBand --forceExit --coverage",
+    "test:watch": "npx jest --watchAll --runInBand",
     "test:integration:run": "npx jest integration --detectOpenHandles --forceExit",
     "test:integration:watch": "npx jest --watchAll --runInBand",
     "start": "node src/server.js",
-    "watch": "nodemon --legacy-watch src/server.js",
-    "start-worker": "node worker/index.js",
-    "watch-worker": "nodemon --legacy-watch worker/index.js"
+    "watch": "nodemon --legacy-watch src/server.js"
   }
 }
