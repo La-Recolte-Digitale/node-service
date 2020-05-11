@@ -2,38 +2,26 @@ service_name=node-template-service
 database_name=node-template-db-test
 
 run:
-	gnome-terminal \
-		--title="${service_name} Containers" \
-		-- sh -c "docker-compose -f docker-compose.yml up; exec bash";
+	docker-compose -f docker-compose.yml up
 
 build:
-	gnome-terminal \
-		--title="${service_name} Containers" \
-		-- sh -c "docker-compose -f docker-compose.yml build; exec bash";
+	docker-compose -f docker-compose.yml build
 
 stop:
 	docker-compose -f docker-compose.yml down
 
 logs:
-	gnome-terminal \
-	--title="Logs_$(service_name)" \
-	-- sh -c "docker logs -f $(service_name); exec bash";
+	docker logs -f $(service_name)
 
 database-logs:
-	gnome-terminal \
-	--title="Logs_$(database_name)" \
-	-- sh -c "docker logs -f $(database_name); exec bash";
+	docker logs -f $(database_name)
 
 ##########################################################
 #######              Common CMD                    #######
 ##########################################################
 tests_integration:
+	# docker-compose -f docker-compose.yml run node-template run npm test:integration:run
 	make runDockerCmd CMD="npm run test:integration:run"
-
-tests_integration_new_terminal:
-	gnome-terminal \
-		--title="${service_name} - Integration Tests" \
-		-- sh -c 'make tests_integration; exec bash';
 		
 tests_integration_watch:
 	make runDockerCmd CMD="npm run test:integration:watch"
@@ -50,6 +38,5 @@ lint-fix:
 ##########################################################
 #######              Common CMD                    #######
 ##########################################################
-#Run a command into the dataviz service docker (npm, npx, ...)
 runDockerCmd:
 	docker exec -it ${service_name} bash -c "${CMD}"
