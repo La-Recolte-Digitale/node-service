@@ -33,13 +33,12 @@ afterEach(async () => {
 
 describe('Server', () => {
   describe('Graceful start and stop', () => {
-    it('starts gracefully', async (done) => {
+    it('starts gracefully', async () => {
       config.server.port = 3005
       await gracefulStart({ api: server })
       await timeout(1)
       expect(global.console.log).toHaveBeenNthCalledWith(1, `info: Mongoose default connection is open {\"service\":\"node-template-service\"}`)
       expect(global.console.log).toHaveBeenNthCalledWith(2, `info: Server is listening on port: 3005 {\"service\":\"node-template-service\"}`)
-      done()
     })
     it('healthz return 200', async () => {
       const res = await request(server)
