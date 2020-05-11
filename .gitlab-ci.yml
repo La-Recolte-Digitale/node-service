@@ -56,7 +56,7 @@ coverage:
   stage: test
   variables:
     TEST_SCRIPT: coverage
-
+  coverage: /All files\s*\|\s*([\d\.]+)/
 
 ###############
 # STAGE: LINT #
