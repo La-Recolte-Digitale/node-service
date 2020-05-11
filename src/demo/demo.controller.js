@@ -21,6 +21,13 @@ exports.get = asyncAction(async (req, res) => {
   res.json(demo)
 })
 
+exports.post = asyncAction(async (req, res) => {
+  const data = req.body || {}
+
+  const demo = await demoService.create(data)
+  res.json(demo)
+})
+
 exports.put = asyncAction(async (req, res, next) => {
   const data = req.body || {}
   const { id } = req.params
@@ -33,10 +40,15 @@ exports.put = asyncAction(async (req, res, next) => {
   res.json(demo)
 })
 
-exports.post = asyncAction(async (req, res) => {
+exports.patch = asyncAction(async (req, res) => {
   const data = req.body || {}
+  const { id } = req.params
 
-  const demo = await demoService.create(data)
+  const demo = await demoService.updateById({ id, data })
+  if (!demo) {
+    throw new NotFoundError(ERROR_MESSAGES.not_found)
+  }
+
   res.json(demo)
 })
 

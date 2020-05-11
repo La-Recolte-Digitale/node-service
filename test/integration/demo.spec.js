@@ -133,6 +133,37 @@ describe('demo tests', () => {
     })
   })
 
+  describe('PATCH /demo/:id', () => {
+    test('responds with 200', async () => {
+      const id = data.patchDemo.id
+      const patchData = data.patchDemo.successPatch
+      const res = await request(server)
+        .patch(`/demo/${id}`)
+        .send(patchData)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(200)
+    })
+
+    test('responds with 200 (patch empty)', async () => {
+      const id = data.patchDemo.id
+      const res = await request(server)
+        .patch(`/demo/${id}`)
+        .send()
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(200)
+    })
+
+    test('responds with incorrect id', async () => {
+      const patchData = data.patchDemo.successPatch
+
+      const res = await request(server)
+        .patch('/demo/61224d776a326fb40f000003')
+        .send(patchData)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(404)
+    })
+  })
+
   describe('DELETE with no id failed /demo', () => {
     test('responds with 204', async () => {
       const id = data.insertIntoDb[0].id
