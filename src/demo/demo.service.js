@@ -24,6 +24,17 @@ exports.updateById = async ({ id, data }) => {
   return demo
 }
 
+exports.replaceOne = async ({ id, data }) => {
+  const demo = await demoModel.findByIdAndUpdate(
+    { _id: id },
+    data,
+    { new: true, 
+      runValidators: true,
+    overwrite: true }
+  )
+  return demo
+}
+
 exports.create = async data => {
   const demo = await demoModel.create(data)
   return demo

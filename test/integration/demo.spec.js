@@ -113,13 +113,23 @@ describe('demo tests', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    test('not complete data', async () => {
+      const id = data.putDemo.id
+      const putData = data.putDemo.failedPut
+      const res = await request(server)
+        .put(`/demo/${id}`)
+        .send(putData)
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(400)
+    })
+
     test('responds with 200 (put empty)', async () => {
       const id = data.putDemo.id
       const res = await request(server)
         .put(`/demo/${id}`)
         .send()
         .set('Accept', 'application/json')
-      expect(res.statusCode).toBe(200)
+      expect(res.statusCode).toBe(400)
     })
 
     test('responds with incorrect id', async () => {

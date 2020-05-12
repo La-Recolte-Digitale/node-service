@@ -32,7 +32,8 @@ exports.put = asyncAction(async (req, res, next) => {
   const data = req.body || {}
   const { id } = req.params
 
-  const demo = await demoService.updateById({ id, data })
+  const demo = await demoService.replaceOne({ id, data })
+
   if (!demo) {
     throw new NotFoundError(ERROR_MESSAGES.not_found)
   }
