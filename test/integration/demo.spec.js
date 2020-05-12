@@ -6,11 +6,15 @@ const Demo = require('../../src/demo/demo.model')
 
 const initializeDatabase = async () => {
   const url = process.env.MONGO_TEST_URL
-  await mongoose.connect(`${url}-${Date.now()}`, { autoIndex: true, useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true })
+  await mongoose.connect(`${url}-${Date.now()}`, {
+    autoIndex: true,
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
   await Demo.ensureIndexes()
 }
-
-mongoose.set('useFindAndModify', false);
 
 data.insertIntoDb.forEach((demo) => {
   demo._id = mongoose.Types.ObjectId(demo.id)
@@ -21,7 +25,6 @@ data.insertIntoDb.forEach((demo) => {
   }
 })
 
-let client
 jest.setTimeout(60000)
 
 beforeAll(async () => {
@@ -63,6 +66,8 @@ describe('demo tests', () => {
         .get(`/demo/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(404)
+      expect(res.body).toMatchObject({ "error": { "message": 'Entity not found.' } })
+
     })
     test('not a valid mongo Id', async () => {
       const id = "Cpasbon"

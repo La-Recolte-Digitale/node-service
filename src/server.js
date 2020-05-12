@@ -11,7 +11,7 @@ const {
   unprocessableEntityHandler,
   entityNotFoundHandler,
   errorHandler
-} = require('./middleware/error-handler.middleware')
+} = require('@la-recolte/error-middleware')
 
 const api = express()
 
@@ -32,11 +32,11 @@ api.use(errorHandler)
 
 /* istanbul ignore next */
 if (!module.parent) {
-  try{
+  try {
     gracefulStart({ api })
   } catch (error) {
     console.error('GracefulStart failed:', error)
-  }  
+  }
 }
 
 const sigs = ['SIGINT', 'SIGTERM', 'SIGQUIT']

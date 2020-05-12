@@ -28,9 +28,11 @@ exports.replaceOne = ({ id, data }) => {
   const demo = demoModel.findByIdAndUpdate(
     { _id: id },
     data,
-    { new: true, 
+    {
+      new: true,
       runValidators: true,
-    overwrite: true }
+      overwrite: true
+    }
   )
   return demo
 }

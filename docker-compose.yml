@@ -20,7 +20,6 @@ services:
       - ./config:/app/config
       - ./src:/app/src
       - ./test:/app/test
-      - ${PWD}/package.json:/app/package.json
   database:
     container_name: node-template-db-test
     image: mongo:4.2.5-bionic

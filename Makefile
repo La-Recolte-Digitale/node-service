@@ -1,3 +1,4 @@
+dc_service_name=node-template
 service_name=node-template-service
 database_name=node-template-db-test
 
@@ -20,23 +21,24 @@ database-logs:
 #######              Common CMD                    #######
 ##########################################################
 tests_integration:
-	# docker-compose -f docker-compose.yml run node-template run npm test:integration:run
-	make runDockerCmd CMD="npm run test:integration:run"
-		
+	make runServiceCmd CMD="npm run test:integration:run"
+	
 tests_integration_watch:
-	make runDockerCmd CMD="npm run test:integration:watch"
+	make runServiceCmd CMD="npm run test:integration:watch"
 
 test_one:
-	make runDockerCmd CMD="npx jest --detectOpenHandles --forceExit -- ${CMD} "
+	make runServiceCmd CMD="npx jest --detectOpenHandles --verbose false --forceExit -- ${FILE} "
 
 lint:
-	make runDockerCmd CMD="npm run lint"
+	make runServiceCmd CMD="npm run lint"
 
 lint-fix:
-	make runDockerCmd CMD="npm run lint:fix"
+	make runServiceCmd CMD="npm run lint:fix"
 
 ##########################################################
 #######              Common CMD                    #######
 ##########################################################
-runDockerCmd:
-	docker exec -it ${service_name} bash -c "${CMD}"
+runServiceCmd:
+	docker-compose -f docker-compose.yml run ${dc_service_name} ${CMD}
+	docker-compose down
+	docker volume prune --force
