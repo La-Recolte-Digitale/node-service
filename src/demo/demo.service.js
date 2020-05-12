@@ -1,0 +1,55 @@
+const demoModel = require('./demo.model')
+
+exports.list = ({ filter, skip, limit, sort, projection }) => {
+  const demos = demoModel.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort(sort)
+    .select(projection)
+    .exec()
+  return demos
+}
+
+exports.findById = id => {
+  const demo = demoModel.findById(id)
+  return demo
+}
+
+exports.updateById = ({ id, data }) => {
+  const demo = demoModel.findByIdAndUpdate(
+    { _id: id },
+    data,
+    { new: true, runValidators: true }
+  )
+  return demo
+}
+
+exports.replaceOne = ({ id, data }) => {
+  const demo = demoModel.findByIdAndUpdate(
+    { _id: id },
+    data,
+    {
+      new: true,
+      runValidators: true,
+      overwrite: true
+    }
+  )
+  return demo
+}
+
+exports.create = async data => {
+  const demo = demoModel.create(data)
+  return demo
+}
+
+exports.deleteById = async id => {
+  const deleteResult = demoModel.deleteOne({ _id: id })
+  return deleteResult
+}
+
+exports.deleteAll = async () => {
+  const deleteAllResult = demoModel.deleteMany({})
+  return deleteAllResult
+}
+
+module.exports = exports

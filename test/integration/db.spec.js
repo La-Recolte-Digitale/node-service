@@ -1,6 +1,3 @@
-const mongoose = require('mongoose')
-//const config = require('../../config/config')
-
 const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }
@@ -13,12 +10,6 @@ global.console = {
   error: jest.fn()
 }
 const OLD_ENV = process.env;
-
-beforeAll(async () => {
-})
-
-afterAll(async () => {
-})
 
 beforeEach(async () => {
   jest.resetModules()
@@ -46,7 +37,7 @@ describe('Database', () => {
       await require('../../src/utils/db').init()
       await timeout(1)
       expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Cannot connect to database {\"service\":\"node-template-service\"}')
-      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occured {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occurred {\"service\":\"node-template-service\"}')
     })
   })
 })

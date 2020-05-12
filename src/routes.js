@@ -1,10 +1,9 @@
-const Demo = require('./controllers/demo')
+const router = require('express').Router({ strict: true })
+const demo = require('./demo/demo.routes')
 
-module.exports = api => {
-  api.route('/demo').get(Demo.list)
-  api.route('/demo/:id').get(Demo.validateParameters, Demo.get)
-  api.route('/demo/:id').put(Demo.validateParameters, Demo.put)
-  api.route('/demo').post(Demo.post)
-  api.route('/demo/:id').delete(Demo.validateParameters, Demo.delete)
-  api.route('/demo').delete(Demo.deleteAll)
-}
+router.use('/demo', demo)
+router.get('/healthz', async (req, res) => {
+  return res.status(200).json({ status: 'ok' })
+})
+
+module.exports = router
