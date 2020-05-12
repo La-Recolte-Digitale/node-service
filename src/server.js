@@ -32,7 +32,11 @@ api.use(errorHandler)
 
 /* istanbul ignore next */
 if (!module.parent) {
-  gracefulStart({ api })
+  try{
+    gracefulStart({ api })
+  } catch (error) {
+    console.error('GracefulStart failed:', error)
+  }  
 }
 
 const sigs = ['SIGINT', 'SIGTERM', 'SIGQUIT']

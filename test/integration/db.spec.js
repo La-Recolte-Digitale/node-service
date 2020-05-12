@@ -11,12 +11,6 @@ global.console = {
 }
 const OLD_ENV = process.env;
 
-beforeAll(async () => {
-})
-
-afterAll(async () => {
-})
-
 beforeEach(async () => {
   jest.resetModules()
   process.env = { ...OLD_ENV };
