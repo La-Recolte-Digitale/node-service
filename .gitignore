@@ -1,3 +1,5 @@
 node_modules
 test/coverage
 test/*.html
+error.log
+combined.log
