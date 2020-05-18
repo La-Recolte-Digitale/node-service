@@ -27,7 +27,7 @@ describe('Database', () => {
       process.env.DB_URI = 'mongodb://database:27017/recipe-db-test'
       await require('../../src/utils/db').init() 
       await timeout(1) 
-      expect(global.console.info).toHaveBeenNthCalledWith(1, 'info: Mongoose default connection is open {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(1, 'info: Mongoose default connection is open {\"service\":\"node-template-service\"}')
     })
     it('has error', async () => {
       delete process.env.DB_URI
@@ -36,8 +36,8 @@ describe('Database', () => {
       expect(config.database.uri).toBe('mongodb://database:27018/db')
       await require('../../src/utils/db').init()
       await timeout(1)
-      expect(global.console.info).toHaveBeenNthCalledWith(4, 'info: Cannot connect to database {\"service\":\"node-template-service\"}')
-      expect(global.console.info).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occurred {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Cannot connect to database {\"service\":\"node-template-service\"}')
+      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occurred {\"service\":\"node-template-service\"}')
     })
   })
 })
