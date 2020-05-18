@@ -39,9 +39,9 @@ mongoose.connection.on('error', async (err) => {
     await init()
   } else {
     logger.info('exiting')
-    // if (process.env.NODE_ENV !== 'test') {
-    //   process.exit(1)
-    // }
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1)
+    }
   }
 })
 
