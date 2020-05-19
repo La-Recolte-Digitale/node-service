@@ -37,6 +37,11 @@ mongoose.connection.on('error', async (err) => {
     await timeout(5)
     logger.info('Attempting to re-establish database connection.')
     await init()
+  } else {
+    logger.info('exiting')
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1)
+    }
   }
 })
 
