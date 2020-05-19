@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const config = require('../../../config/config')
 const logger = require('../logger')
 
+/* istanbul ignore next */
 const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }
@@ -18,6 +19,7 @@ const closeConnection = async () => {
   try {
     await mongoose.connection.close()
   } catch (error) {
+    /* istanbul ignore next */
     logger.info('Cannot close database')
   }
 }
