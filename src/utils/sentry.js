@@ -3,6 +3,7 @@ const Integrations = require('@sentry/integrations')
 const config = require('../../config/config').sentry.service
 
 let isActiveSentry = config.sampleRate
+/* istanbul ignore next */
 if (!isActiveSentry) {
   ['staging', 'production'].includes(process.env.NODE_ENV)
     ? isActiveSentry = 1

@@ -57,6 +57,7 @@ class ValidationError extends RequestError {
     super()
     this.name = 'ValidationError'
     this.statusCode = 400
+    /* istanbul ignore next */
     this.message = message || 'Validation Error'
     Object.setPrototypeOf(this, ValidationError.prototype)
   }

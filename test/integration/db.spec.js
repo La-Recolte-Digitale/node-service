@@ -32,6 +32,7 @@ describe('Database', () => {
     it('has error', async () => {
       delete process.env.DB_URI
       process.env.DB_URI = 'mongodb://database:27018/db'
+      process.env.NODE_ENV= 'test'
       const config = require('../../config/config')
       expect(config.database.uri).toBe('mongodb://database:27018/db')
       await require('../../src/utils/db').init()
