@@ -6,12 +6,17 @@ exports.list = ({ filter, skip, limit, sort, projection }) => {
     .limit(limit)
     .sort(sort)
     .select(projection)
+    .lean()
     .exec()
   return demos
 }
 
+exports.getTotalCount = ({ filter }) => {
+  return demoModel.count(filter).exec()
+}
+
 exports.findById = id => {
-  const demo = demoModel.findById(id)
+  const demo = demoModel.findById(id).lean()
   return demo
 }
 

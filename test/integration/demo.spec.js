@@ -43,27 +43,37 @@ afterEach(async () => {
 })
 
 describe('demo tests', () => {
-  describe('GET /demo', () => {
-    test('responds with 200', async () => {
+  describe('GET /demos', () => {
+    test('responds with 200 and returns only 2 results by default', async () => {
       const res = await request(server)
-        .get('/demo')
+        .get('/demos')
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
+      expect(res.body.demos.length).toBe(2)
+      expect(res.body.total).toBe(3)
+    })
+    test('responds with 200 and returns all results when putting a limit', async () => {
+      const res = await request(server)
+        .get('/demos?limit=10')
+        .set('Accept', 'application/json')
+      expect(res.statusCode).toBe(200)
+      expect(res.body.demos.length).toBe(3)
+      expect(res.body.total).toBe(3)
     })
   })
 
-  describe('GET /demo/:id', () => {
+  describe('GET /demos/:id', () => {
     test('responds with 200', async () => {
       const id = data.insertIntoDb[0].id
       const res = await request(server)
-        .get(`/demo/${id}`)
+        .get(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
     test('respond with 404', async () => {
       const id = "5e9ec0938777791177bd5727"
       const res = await request(server)
-        .get(`/demo/${id}`)
+        .get(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(404)
       expect(res.body).toMatchObject({ "error": { "message": 'Entity not found.' } })
@@ -72,47 +82,47 @@ describe('demo tests', () => {
     test('not a valid mongo Id', async () => {
       const id = "Cpasbon"
       const res = await request(server)
-        .get(`/demo/${id}`)
+        .get(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(400)
     })
   })
 
-  describe('GET /demo/:id', () => {
+  describe('GET /demos/:id', () => {
     test('responds with 200', async () => {
       const id = data.insertIntoDb[0].id
       const res = await request(server)
-        .get(`/demo/${id}`)
+        .get(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
   })
 
-  describe('POST /demo', () => {
+  describe('POST /demos', () => {
     test('responds with 200', async () => {
       const postData = data.postDemo.successPost
 
       const res = await request(server)
-        .post('/demo')
+        .post('/demos')
         .send(postData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
     test('responds with 400', async () => {
       const res = await request(server)
-        .post('/demo')
+        .post('/demos')
         .send()
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(400)
     })
   })
 
-  describe('PUT /demo/:id', () => {
+  describe('PUT /demos/:id', () => {
     test('responds with 200', async () => {
       const id = data.putDemo.id
       const putData = data.putDemo.successPut
       const res = await request(server)
-        .put(`/demo/${id}`)
+        .put(`/demos/${id}`)
         .send(putData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
@@ -122,7 +132,7 @@ describe('demo tests', () => {
       const id = data.putDemo.id
       const putData = data.putDemo.failedPut
       const res = await request(server)
-        .put(`/demo/${id}`)
+        .put(`/demos/${id}`)
         .send(putData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(400)
@@ -131,7 +141,7 @@ describe('demo tests', () => {
     test('responds with 200 (put empty)', async () => {
       const id = data.putDemo.id
       const res = await request(server)
-        .put(`/demo/${id}`)
+        .put(`/demos/${id}`)
         .send()
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(400)
@@ -141,19 +151,19 @@ describe('demo tests', () => {
       const putData = data.putDemo.successPut
 
       const res = await request(server)
-        .put('/demo/51224d776a326fb40f000003')
+        .put('/demos/51224d776a326fb40f000003')
         .send(putData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(404)
     })
   })
 
-  describe('PATCH /demo/:id', () => {
+  describe('PATCH /demos/:id', () => {
     test('responds with 200', async () => {
       const id = data.patchDemo.id
       const patchData = data.patchDemo.successPatch
       const res = await request(server)
-        .patch(`/demo/${id}`)
+        .patch(`/demos/${id}`)
         .send(patchData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
@@ -162,7 +172,7 @@ describe('demo tests', () => {
     test('responds with 200 (patch empty)', async () => {
       const id = data.patchDemo.id
       const res = await request(server)
-        .patch(`/demo/${id}`)
+        .patch(`/demos/${id}`)
         .send()
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
@@ -172,7 +182,7 @@ describe('demo tests', () => {
       const patchData = data.patchDemo.successPatch
 
       const res = await request(server)
-        .patch('/demo/61224d776a326fb40f000003')
+        .patch('/demos/61224d776a326fb40f000003')
         .send(patchData)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(404)
@@ -183,16 +193,16 @@ describe('demo tests', () => {
     test('responds with 204', async () => {
       const id = data.insertIntoDb[0].id
       const res = await request(server)
-        .delete(`/demo/${id}`)
+        .delete(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(204)
     })
   })
 
-  describe('DELETE ALL /demo', () => {
+  describe('DELETE ALL /demos', () => {
     test('responds with 204', async () => {
       const res = await request(server)
-        .delete('/demo')
+        .delete('/demos')
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(204)
     })
