@@ -46,7 +46,7 @@ describe('Server', () => {
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(200)
     })
-    it('healthz return 404 on unknown routes', async () => {
+    it('return 404 on unknown routes', async () => {
       const res = await request(server)
         .get('/unknown')
         .set('Accept', 'application/json')
