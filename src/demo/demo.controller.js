@@ -5,11 +5,15 @@ const {
   NotFoundError
 } = require('../errors')
 const { asyncAction } = require('../utils/request')
+const DEFAULT_LIMIT = 2
 
 exports.list = asyncAction(async (req, res) => {
-  const { filter, skip, limit, sort, projection } = aqp(req.query)
-  const demos = await demoService.list({ filter, skip, limit, sort, projection })
-  res.json({ demos: demos })
+  let { filter, skip, limit, sort, projection } = aqp(req.query)
+  limit = limit || DEFAULT_LIMIT
+  const demoPromise = demoService.list({ filter, skip, limit, sort, projection })
+  const countPromise = demoService.getTotalCount({ filter })
+  const [demos, total] = await Promise.all([demoPromise, countPromise])
+  res.json({ demos: demos, total: total })
 })
 
 exports.get = asyncAction(async (req, res) => {
