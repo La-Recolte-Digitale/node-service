@@ -1,6 +1,6 @@
 const Sentry = require('@sentry/node')
 const Integrations = require('@sentry/integrations')
-const config = require('../../config/config').sentry.service
+const config = require('../../config/config').sentry
 
 let isActiveSentry = config.sampleRate
 /* istanbul ignore next */
