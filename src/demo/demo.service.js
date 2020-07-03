@@ -12,7 +12,7 @@ exports.list = ({ filter, skip, limit, sort, projection }) => {
 }
 
 exports.getTotalCount = ({ filter }) => {
-  return demoModel.count(filter).exec()
+  return demoModel.countDocuments(filter).exec()
 }
 
 exports.findById = id => {
