@@ -197,14 +197,6 @@ describe('demo tests', () => {
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(204)
     })
-  })
 
-  describe('DELETE ALL /demos', () => {
-    test('responds with 204', async () => {
-      const res = await request(server)
-        .delete('/demos')
-        .set('Accept', 'application/json')
-      expect(res.statusCode).toBe(204)
-    })
   })
 })

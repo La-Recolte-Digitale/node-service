@@ -63,9 +63,5 @@ exports.delete = asyncAction(async (req, res) => {
   res.status(204).send()
 })
 
-exports.deleteAll = asyncAction(async (req, res) => {
-  await demoService.deleteAll()
-  return res.status(204).send()
-})
 
 module.exports = exports

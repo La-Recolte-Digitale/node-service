@@ -52,9 +52,4 @@ exports.deleteById = async id => {
   return deleteResult
 }
 
-exports.deleteAll = async () => {
-  const deleteAllResult = demoModel.deleteMany({})
-  return deleteAllResult
-}
-
 module.exports = exports
