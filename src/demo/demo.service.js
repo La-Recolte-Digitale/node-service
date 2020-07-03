@@ -48,7 +48,7 @@ exports.create = async data => {
 }
 
 exports.deleteById = async id => {
-  const deleteResult = demoModel.deleteOne({ _id: id })
+  const deleteResult = demoModel.findOneAndDelete({ _id: id })
   return deleteResult
 }
 

@@ -59,7 +59,12 @@ exports.patch = asyncAction(async (req, res) => {
 
 exports.delete = asyncAction(async (req, res) => {
   const { id } = req.params
-  await demoService.deleteById(id)
+  
+  const demo = await demoService.deleteById(id)
+  if (!demo) {
+    throw new NotFoundError(ERROR_MESSAGES.not_found)
+  }
+
   res.status(204).send()
 })
 
