@@ -16,7 +16,7 @@
     "kafka-node": "5.0.0",
     "mongoose": "5.9.10",
     "npm-check-updates": "4.1.2",
-    "winston": "3.2.1",
+    "winston": "3.3.3",
     "@la-recolte/error-middleware": "0.1.4"
   },
   "devDependencies": {
