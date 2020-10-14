@@ -1,5 +1,9 @@
 const demoModel = require('./demo.model')
 
+demoModel.on('index', error => {
+  if (error) console.warn(error.message)
+})
+
 exports.list = ({ filter, skip, limit, sort, projection }) => {
   const demos = demoModel.find(filter)
     .skip(skip)
