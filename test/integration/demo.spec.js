@@ -39,7 +39,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-  await Demo.collection.remove({})
+  await Demo.collection.deleteMany({})
 })
 
 describe('demo tests', () => {
