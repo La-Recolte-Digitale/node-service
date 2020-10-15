@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const logger = require('../utils/logger')
+
 const Schema = mongoose.Schema
 
 const DemoSchema = new Schema(
@@ -15,4 +17,10 @@ const DemoSchema = new Schema(
   { collection: 'demos', timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 )
 
-module.exports = mongoose.model('Demo', DemoSchema)
+const demoModel = mongoose.model('Demo', DemoSchema)
+
+demoModel.on('index', error => {
+  if (error) logger.warn(error.message)
+})
+
+module.exports = demoModel

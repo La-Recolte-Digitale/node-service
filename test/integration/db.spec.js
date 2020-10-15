@@ -1,44 +1,46 @@
+let db = require('../../src/utils/db')
+let logger = require('../../src/utils/logger')
+jest.mock('../../src/utils/logger')
+
 const timeout = (seconds) => {
   return new Promise(resolve => setTimeout(resolve, 1000 * seconds))
 }
 
 jest.setTimeout(60000)
 
-global.console = {
-  log: jest.fn(),
-  info: jest.fn(),
-  error: jest.fn()
-}
-const OLD_ENV = process.env;
+const OLD_ENV = process.env
 
 beforeEach(async () => {
   jest.resetModules()
-  process.env = { ...OLD_ENV };
-  delete process.env.DB_URI;
+  logger.info.mockClear()
+  process.env = { ...OLD_ENV }
+  delete process.env.DB_URI
 })
 
 afterEach(async () => {
-  await require('../../src/utils/db').closeConnection()
+  await db.closeConnection()
 })
 
 describe('Database', () => {
   describe('Connection', () => {
     it('is opened and closed', async () => {
-      process.env.DB_URI = 'mongodb://database:27017/recipe-db-test'
-      await require('../../src/utils/db').init() 
-      await timeout(1) 
-      expect(global.console.log).toHaveBeenNthCalledWith(1, 'info: Mongoose default connection is open {\"service\":\"node-template-service\"}')
+      await db.init()
+      await timeout(1)
+      expect(logger.info).toHaveBeenNthCalledWith(1, 'Mongoose default connection is open')
     })
     it('has error', async () => {
       delete process.env.DB_URI
       process.env.DB_URI = 'mongodb://database:27018/db'
-      process.env.NODE_ENV= 'test'
+      process.env.NODE_ENV = 'test'
       const config = require('../../config/config')
+      db = require('../../src/utils/db')
+      logger = require('../../src/utils/logger')
+      jest.mock('../../src/utils/logger')
       expect(config.database.uri).toBe('mongodb://database:27018/db')
-      await require('../../src/utils/db').init()
+      await db.init()
       await timeout(1)
-      expect(global.console.log).toHaveBeenNthCalledWith(4, 'info: Cannot connect to database {\"service\":\"node-template-service\"}')
-      expect(global.console.log).toHaveBeenNthCalledWith(5, 'info: An error on mongoose default connection has occurred {\"service\":\"node-template-service\"}')
+      expect(logger.info).toHaveBeenNthCalledWith(2, 'Cannot connect to database')
+      expect(logger.info).toHaveBeenNthCalledWith(3, 'An error on mongoose default connection has occurred')
     })
   })
 })

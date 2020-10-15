@@ -39,7 +39,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-  await Demo.collection.drop()
+  await Demo.collection.deleteMany({})
 })
 
 describe('demo tests', () => {
@@ -71,16 +71,15 @@ describe('demo tests', () => {
       expect(res.statusCode).toBe(200)
     })
     test('respond with 404', async () => {
-      const id = "5e9ec0938777791177bd5727"
+      const id = '5e9ec0938777791177bd5727'
       const res = await request(server)
         .get(`/demos/${id}`)
         .set('Accept', 'application/json')
       expect(res.statusCode).toBe(404)
-      expect(res.body).toMatchObject({ "error": { "message": 'Entity not found.' } })
-
+      expect(res.body).toMatchObject({ error: { message: 'Entity not found.' } })
     })
     test('not a valid mongo Id', async () => {
-      const id = "Cpasbon"
+      const id = 'Cpasbon'
       const res = await request(server)
         .get(`/demos/${id}`)
         .set('Accept', 'application/json')
@@ -198,6 +197,5 @@ describe('demo tests', () => {
 
       expect(res.statusCode).toBe(204)
     })
-
   })
 })
