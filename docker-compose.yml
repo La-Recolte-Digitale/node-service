@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   node-template:
     container_name: node-template-service
