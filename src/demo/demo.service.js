@@ -1,9 +1,4 @@
 const demoModel = require('./demo.model')
-const logger = require('../utils/logger')
-
-demoModel.on('index', error => {
-  if (error) logger.warn(error.message)
-})
 
 exports.list = ({ filter, skip, limit, sort, projection }) => {
   const demos = demoModel.find(filter)
