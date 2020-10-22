@@ -6,7 +6,7 @@ exports.list = ({ filter, skip, limit, sort, projection }) => {
     .limit(limit)
     .sort(sort)
     .select(projection)
-    .lean()
+    .lean({ virtuals: true })
     .exec()
   return demos
 }
@@ -16,7 +16,7 @@ exports.getTotalCount = ({ filter }) => {
 }
 
 exports.findById = id => {
-  const demo = demoModel.findById(id).lean()
+  const demo = demoModel.findById(id).lean({ virtuals: true })
   return demo
 }
 
