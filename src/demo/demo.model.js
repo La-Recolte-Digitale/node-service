@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const mongooseLeanVirtuals = require('mongoose-lean-virtuals')
 const logger = require('../utils/logger')
 
 const Schema = mongoose.Schema
@@ -19,6 +20,7 @@ const DemoSchema = new Schema(
 
 DemoSchema.set('toObject', { getters: true, virtuals: true })
 DemoSchema.set('toJSON', { getters: true, virtuals: true })
+DemoSchema.plugin(mongooseLeanVirtuals)
 
 const demoModel = mongoose.model('Demo', DemoSchema)
 
