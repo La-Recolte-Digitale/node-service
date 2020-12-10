@@ -15,12 +15,8 @@ const gracefulStart = async ({ api }) => {
 const gracefulShutdown = async () => {
   await server.close()
   logger.info('[GRACEFUL SHUTDOWN] - Server is closed')
-  await db.closeConnection()
   logger.info('[GRACEFUL SHUTDOWN] - Mongoose default connection is disconnected due to application termination')
-  /* istanbul ignore next */
-  if (!module.parent.parent.filename.includes('server.spec.js')) {
-    process.exit(0)
-  }
+  await db.closeConnection()
 }
 
 module.exports = { gracefulStart, gracefulShutdown }
