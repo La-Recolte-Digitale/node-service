@@ -49,6 +49,9 @@ mongoose.connection.on('error', async (err) => {
 
 mongoose.connection.on('disconnected', () => {
   logger.info('Mongoose default connection is disconnected')
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1)
+  }
 })
 
 module.exports = {

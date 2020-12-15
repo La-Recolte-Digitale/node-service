@@ -51,7 +51,7 @@ describe('Server', () => {
       process.emit('SIGQUIT')
       await timeout(1)
       expect(logger.info).toHaveBeenNthCalledWith(3, '[GRACEFUL SHUTDOWN] - Server is closed')
-      expect(logger.info).toHaveBeenNthCalledWith(5, '[GRACEFUL SHUTDOWN] - Mongoose default connection is disconnected due to application termination')
+      expect(logger.info).toHaveBeenNthCalledWith(4, '[GRACEFUL SHUTDOWN] - Mongoose default connection is disconnected due to application termination')
     })
   })
 })
