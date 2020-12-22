@@ -1,27 +1,35 @@
 const Sentry = require('@sentry/node')
 const Integrations = require('@sentry/integrations')
-const config = require('../../config/config').sentry
+const { sentry: sentryConf } = require('../../config/config')
 
-let isActiveSentry = config.sampleRate
+const isProductionEnv = () => {
+  return ['staging', 'production'].includes(process.env.NODE_ENV)
+}
+
+let isActiveSentry = sentryConf.sampleRate
 /* istanbul ignore next */
 if (!isActiveSentry) {
-  ['staging', 'production'].includes(process.env.NODE_ENV)
+  isProductionEnv()
     ? isActiveSentry = 1
     : isActiveSentry = 0
 }
 
 Sentry.init({
-  dsn: config.dsn,
+  dsn: sentryConf.dsn,
   environment: process.env.NODE_ENV,
   integrations: [
     new Integrations.CaptureConsole({
-      levels: ['debug', 'info', 'warn', 'error', 'fatal']
+      levels: ['warn', 'error', 'fatal']
     })
   ],
   maxBreadcrumbs: 50,
   attachStacktrace: true,
-  debug: config.debug,
+  debug: sentryConf.debug,
   sampleRate: isActiveSentry
 })
+
+if (isProductionEnv()) {
+  console.warn('Sentry was initialized.')
+}
 
 module.exports = Sentry
