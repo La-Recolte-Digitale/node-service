@@ -1,3 +1,1 @@
-const asyncAction = (action) => (req, res, next) => action(req, res, next).catch(next)
-
-module.exports = { asyncAction }
+exports.asyncAction = (action) => (req, res, next) => action(req, res, next).catch(next)

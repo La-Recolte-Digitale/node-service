@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "api-query-params": "4.15.0",
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "body-parser": "1.19.0",
     "cors": "2.8.5",
     "express": "4.17.1",
@@ -23,7 +23,10 @@
   "devDependencies": {
     "@sentry/integrations": "5.15.5",
     "@sentry/node": "5.15.5",
-    "audit-ci": "2.5.1",
+    "winston": "3.2.1",
+    "@la-recolte/error-middleware": "0.1.6",
+    "module-alias": "^2.2.2",
+    "audit-ci": "3.1.1",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
@@ -63,7 +66,12 @@
           "includeConsoleLog": true
         }
       ]
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@test-service(.*)$": "<rootDir>/test$1",
+      "^@service(.*)$": "<rootDir>/src$1",
+      "^@config(.*)$": "<rootDir>/config$1"
+    }
   },
   "scripts": {
     "audit": "audit-ci -h",
@@ -76,5 +84,10 @@
     "test:integration:watch": "npx jest --watchAll --runInBand",
     "start": "node src/server.js",
     "watch": "nodemon --legacy-watch src/server.js"
+  },
+  "_moduleAliases": {
+    "@test-service": "test/",
+    "@service": "src/",
+    "@config": "config/"
   }
 }

@@ -1,8 +1,10 @@
-require('./utils/sentry')
+require('module-alias/register')
+require('@service/utils/sentry')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const { gracefulStart, gracefulShutdown } = require('./utils/server')
+const { gracefulStart, gracefulShutdown } = require('@service/utils/server')
 const routes = require('./routes')
 const {
   mongooseErrorHandler,

@@ -1,8 +1,8 @@
 const request = require('supertest')
-const server = require('../../src/server')
-const config = require('../../config/config')
-const logger = require('../../src/utils/logger')
-jest.mock('../../src/utils/logger')
+const logger = require('@service/utils/logger')
+jest.mock('@service/utils/logger')
+const server = require('@service/server')
+const config = require('@config/config')
 
 const { gracefulStart } = require('../../src/utils/server')
 

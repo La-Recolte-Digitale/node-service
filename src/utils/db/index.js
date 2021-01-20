@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const config = require('../../../config/config')
-const logger = require('../logger')
+const config = require('@config/config')
+const logger = require('@service/utils/logger')
 
 /* istanbul ignore next */
 const timeout = (seconds) => {

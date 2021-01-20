@@ -1,8 +1,8 @@
-const server = require('../../src/server')
+const server = require('@service/server')
 const request = require('supertest')
-const data = require('../data/demo.json')
+const data = require('@test-service/data/demo')
 const mongoose = require('mongoose')
-const Demo = require('../../src/demo/demo.model')
+const Demo = require('@service/demo/demo.model')
 
 const initializeDatabase = async () => {
   const url = process.env.MONGO_TEST_URL
