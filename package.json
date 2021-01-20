@@ -17,15 +17,13 @@
     "mongoose": "5.9.10",
     "npm-check-updates": "4.1.2",
     "winston": "3.3.3",
-    "@la-recolte/error-middleware": "0.1.4",
-    "mongoose-lean-virtuals": "0.6.9"
+    "@la-recolte/error-middleware": "0.1.6",
+    "mongoose-lean-virtuals": "0.6.9",
+    "module-alias": "^2.2.2",
+    "@sentry/integrations": "5.15.5",
+    "@sentry/node": "5.15.5"
   },
   "devDependencies": {
-    "@sentry/integrations": "5.15.5",
-    "@sentry/node": "5.15.5",
-    "winston": "3.2.1",
-    "@la-recolte/error-middleware": "0.1.6",
-    "module-alias": "^2.2.2",
     "audit-ci": "3.1.1",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
