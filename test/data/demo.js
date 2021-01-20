@@ -2,7 +2,16 @@ exports.insertIntoDb = [
   {
     id: '41224d776a326fb40f000003',
     name: 'demo_test'
+  },
+  {
+    "id": "41224d776a326fb40f000004",
+    "name": "demo2_test"
+  },
+  {
+    "id": "41224d776a326fb40f000005",
+    "name": "demo3_test"
   }
+
 ]
 
 exports.postDemo = {

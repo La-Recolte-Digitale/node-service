@@ -18,11 +18,11 @@ service-logs:
 	docker logs -f $(service_name)
 
 service-tests:
-	-docker-compose -f docker-compose.yml run ${dc_service_name} npm run test
+	-docker-compose -f docker-compose.yml run -e NODE_ENV=test ${dc_service_name} npm run test 
 	make service-stop
 
 service-test-one:
-	-docker-compose -f docker-compose.yml run ${dc_service_name} npx jest --detectOpenHandles --runInBand --verbose false --forceExit -- ${CMD}
+	-docker-compose -f docker-compose.yml run -e NODE_ENV=test ${dc_service_name} npx jest --detectOpenHandles --runInBand --verbose false --forceExit -- ${CMD}
 	make worker-stop
 
 service-lint:
