@@ -47,16 +47,15 @@ test:
     - .template-test
     - .test
   stage: test
-  coverage: /All files\s*\|\s*([\d\.]+)/
   
-# coverage:
-#   extends:
-#     - .template-test
-#     - .test
-#   stage: test
-#   variables:
-#     TEST_SCRIPT: coverage
-#   coverage: /All files\s*\|\s*([\d\.]+)/
+coverage:
+  extends:
+    - .template-test
+    - .test
+  stage: test
+  variables:
+    TEST_SCRIPT: coverage
+  coverage: /All files\s*\|\s*([\d\.]+)/
 
 ###############
 # STAGE: LINT #

@@ -76,7 +76,7 @@
     "format": "npx prettier-standard src/**/*.js",
     "lint": "npx eslint ./src",
     "lint:fix": "npx eslint ./src --fix",
-    "test": "npx jest --runInBand --forceExit --coverage",
+    "test": "npx jest --runInBand --forceExit --coverage false",
     "test:watch": "npx jest --watchAll --runInBand",
     "test:integration:run": "npx jest integration --detectOpenHandles --forceExit --verbose false",
     "test:integration:watch": "npx jest --watchAll --runInBand",
