@@ -1,11 +1,8 @@
 const aqp = require('api-query-params')
 const demoService = require('./demo.service')
-const {
-  ERROR_MESSAGES,
-  NotFoundError
-} = require('../errors')
-const { asyncAction } = require('../utils/request')
 const DEFAULT_LIMIT = 2
+const { ERROR_MESSAGES, NotFoundError } = require('@service/errors')
+const { asyncAction } = require('@service/utils/request')
 
 exports.list = asyncAction(async (req, res) => {
   let { filter, skip, limit, sort, projection } = aqp(req.query)

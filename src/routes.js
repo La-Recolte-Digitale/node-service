@@ -1,5 +1,5 @@
 const router = require('express').Router({ strict: true })
-const demo = require('./demo/demo.routes')
+const demo = require('@service/demo/demo.routes')
 
 router.use('/demos', demo)
 router.get('/healthz', async (req, res) => {

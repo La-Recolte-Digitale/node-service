@@ -1,6 +1,5 @@
 const { ObjectId } = require('mongoose').Types
-const { ValidationError, ERROR_MESSAGES } = require('../errors')
-// const { asyncAction } = require('../utils/')
+const { ValidationError, ERROR_MESSAGES } = require('@service/errors')
 
 const validateParameters = async (req, res, next) => {
   const { id } = req.params

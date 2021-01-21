@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "baseUrl": "./",
+    "paths": {
+      "@test-service/*": ["test/*"],
+      "@service/*": ["src/*"],
+      "@config/*": ["config/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/node_modules/*"]
+}
