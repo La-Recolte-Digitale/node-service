@@ -1,7 +1,8 @@
 const aqp = require('api-query-params')
 const demoService = require('./demo.service')
 const DEFAULT_LIMIT = 2
-const { ERROR_MESSAGES, NotFoundError } = require('@service/errors')
+const { ERROR_MESSAGES } = require('@service/constants')
+const { NotFoundError } = require('@la-recolte/error-middleware')
 const { asyncAction } = require('@service/utils/request')
 
 exports.list = asyncAction(async (req, res) => {

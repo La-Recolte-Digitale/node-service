@@ -6,15 +6,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const { gracefulStart, gracefulShutdown } = require('@service/utils/server')
 const routes = require('./routes')
-const {
-  mongooseErrorHandler,
-  validationErrorHandler,
-  duplicateKeyErrorHandler,
-  requestErrorHandler,
-  unprocessableEntityHandler,
-  entityNotFoundHandler,
-  errorHandler
-} = require('@la-recolte/error-middleware')
+const { errorMiddleware } = require('@la-recolte/error-middleware')
 
 const api = express()
 
@@ -24,14 +16,7 @@ api.use(bodyParser.json())
 
 api.use(routes)
 
-// Error management
-api.use(unprocessableEntityHandler)
-api.use(mongooseErrorHandler)
-api.use(validationErrorHandler)
-api.use(duplicateKeyErrorHandler)
-api.use(requestErrorHandler)
-api.use(entityNotFoundHandler)
-api.use(errorHandler)
+api.use(errorMiddleware)
 
 /* istanbul ignore next */
 if (!module.parent) {

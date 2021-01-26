@@ -17,7 +17,7 @@
     "mongoose": "5.9.10",
     "npm-check-updates": "4.1.2",
     "winston": "3.3.3",
-    "@la-recolte/error-middleware": "0.1.6",
+    "@la-recolte/error-middleware": "1.0.1",
     "mongoose-lean-virtuals": "0.6.9",
     "module-alias": "^2.2.2",
     "@sentry/integrations": "5.15.5",
