@@ -15,7 +15,7 @@ const DemoSchema = new Schema(
       required: false
     }
   },
-  { collection: 'demos', timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
+  { collection: 'demos', timestamps: true }
 )
 
 DemoSchema.set('toObject', { getters: true, virtuals: true })
