@@ -2,7 +2,6 @@ require('module-alias/register')
 require('@service/utils/sentry')
 
 const express = require('express')
-const bodyParser = require('body-parser')
 const cors = require('cors')
 const { gracefulStart, gracefulShutdown } = require('@service/utils/server')
 const routes = require('./routes')
@@ -11,8 +10,8 @@ const { errorMiddleware } = require('@la-recolte/error-middleware')
 const api = express()
 
 api.use(cors())
-api.use(bodyParser.urlencoded({ extended: true }))
-api.use(bodyParser.json())
+api.use(express.urlencoded({ extended: true }))
+api.use(express.json())
 
 api.use(routes)
 
