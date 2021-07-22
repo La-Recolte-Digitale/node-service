@@ -1,6 +1,0 @@
-version: '3'
-services:
-  node-template:
-    command: npm run test:integration:watch
-    environment:
-      - NODE_ENV=test

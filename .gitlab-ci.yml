@@ -1,35 +1,32 @@
-image: docker:stable
+image: docker:19.03.1
 services:
-  - docker:18.09-dind
+  - docker:19.03.1-dind
 
 stages:
-  - test
   - build
+  - test
   - deploy
   - open
 
 #############
 # TEMPLATES #
 #############
-
 include:
-  # - template: Security/SAST.gitlab-ci.yml
   - template: Jobs/Code-Quality.gitlab-ci.yml
-  - project: 'la-recolte/template'
-    file: '/template-test.gitlab-ci.yml'
-  - project: 'la-recolte/template'
-    file: '/template-build.gitlab-ci.yml'
-  - project: 'la-recolte/template'
-    file: '/template-deploy.gitlab-ci.yml'
-  - project: 'la-recolte/template'
-    file: '/template-security.gitlab-ci.yml'
+  - project: "la-recolte/template"
+    file: "/template-test.gitlab-ci.yml"
+  - project: "la-recolte/template"
+    file: "/template-build.gitlab-ci.yml"
+  - project: "la-recolte/template"
+    file: "/template-deploy.gitlab-ci.yml"
+  - project: "la-recolte/template"
+    file: "/template-security.gitlab-ci.yml"
   - project: 'la-recolte/template'
     file: '/template-auto-mr.gitlab-ci.yml'  
 
 #############
 # VARIABLES #
 #############
-
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
@@ -39,6 +36,26 @@ variables:
   SERVICE_NAME: node-template
 
 ###############
+# STAGE: BUILD#
+###############
+build-master:
+  extends:
+    - .template-build
+    - .build-master
+
+build:
+  extends:
+    - .template-build
+    - .build
+
+build-dev:
+  extends:
+    - .template-build
+  script:
+    - docker build -f Dockerfile.dev --pull -t "$CI_REGISTRY_IMAGE:ci" .
+    - docker push "$CI_REGISTRY_IMAGE:ci"
+
+###############
 # STAGE: TEST #
 ###############
 test:
@@ -46,20 +63,11 @@ test:
     - .template-test
     - .test
   stage: test
-  
-coverage:
-  extends:
-    - .template-test
-    - .test
-  stage: test
-  variables:
-    TEST_SCRIPT: coverage
   coverage: /All files\s*\|\s*([\d\.]+)/
 
 ###############
 # STAGE: LINT #
 ###############
-
 lint:
   extends: .lint
   except:
@@ -73,29 +81,12 @@ lint-master:
 ###################
 # STAGE: SECURITY #
 ###################
-
 security:
   extends: .template-security
-
-
-###############
-# STAGE: BUILD#
-###############
-
-build-master:
-  extends:
-    - .template-build
-    - .build-master
-
-build:
-  extends:
-    - .template-build
-    - .build
 
 ################
 # STAGE: DEPLOY#
 ################
-
 deploy_staging:
   extends: .template-deploy
 
@@ -123,7 +114,6 @@ rollback_production:
 #################
 # STAGE: AUTO-MR#
 #################
-
 merge_request:
   extends: .open_merge_request
   only:
