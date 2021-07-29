@@ -3,5 +3,5 @@ services:
   node-template:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: dev.Dockerfile
       

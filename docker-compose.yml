@@ -4,7 +4,7 @@ services:
     container_name: node-template-service
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: dev.Dockerfile
     networks: 
       net:
         aliases:
