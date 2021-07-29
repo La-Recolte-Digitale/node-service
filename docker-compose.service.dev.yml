@@ -1,0 +1,7 @@
+version: '3'
+services:
+  node-template:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      
